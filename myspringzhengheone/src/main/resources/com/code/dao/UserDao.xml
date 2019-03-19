@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.code.dao.UserDao">
+
+    <resultMap id="userAcount" type="user" >
+        <id property="id" column="id"></id>
+        <collection property="acounts" ofType="acount">
+            <id property="id" column="aid"></id>
+            <result property="uid" column="uid"/>
+        </collection>
+    </resultMap>
+
+    <cache/>
+    <select id="findAll" resultMap="userAcount">
+        SELECT u.*,a.id aid,a.MONEY,a.UID from user u LEFT OUTER JOIN account a ON u.id = a.UID
+    </select>
+
+
+</mapper>

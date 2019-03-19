@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context
+                            http://www.springframework.org/schema/context/spring-context.xsd
+                            http://www.springframework.org/schema/aop
+                            http://www.springframework.org/schema/aop/spring-aop.xsd
+                            http://www.springframework.org/schema/tx
+                            http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+<!--开启注解扫描-->
+    <context:component-scan base-package="com.code"></context:component-scan>
+    <!--读取配置文件-->
+    <context:property-placeholder location="classpath:jdbc.properties"></context:property-placeholder>
+
+    <!--配置数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driver}"></property>
+        <property name="jdbcUrl" value="${jdbc.url}"></property>
+        <property name="user" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+    <!--整合mybatis框架-->
+    <!--使用spring代替SqlMapConfig.xml中的配置-->
+    <!--配置mybatis设置setting-->
+     <bean id="configuration" class="org.apache.ibatis.session.Configuration">
+         <!--延迟加载-->
+         <property name="lazyLoadingEnabled" value="true"></property>
+         <!--自动映射-->
+         <property name="autoMappingBehavior" value="FULL"></property>
+     </bean>
+    <!--SqlSessionFactoryBean可以创建接口的代理对象并放入spring容器-->
+    <bean id="sessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--引入数据库环境-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--配置别名-->
+        <!--感觉这里有问题-->
+        <property name="typeAliasesPackage" value="com.code.domain"></property>
+        <property name="configuration" ref="configuration"></property>
+    </bean>
+    <!--加载映射配置文件-->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.code.dao"></property>
+    </bean>
+
+    <!--配置springmvc-->
+    <!--配置视图解析器-->
+    <bean id="internalResourceViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/" ></property>
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+    <!--配置释放资源-->
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
+    <!--配置注解驱动-->
+    <mvc:annotation-driven></mvc:annotation-driven>
+</beans>
